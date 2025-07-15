@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Customer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #28a745;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .form-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      margin: 2rem auto;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #status {
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="form.html">➕ Add Customer</a>
+    <a href="customers.html">📋 View Customers</a>
+  </nav>
+
+  <div class="form-container">
+    <h2>Add New Customer</h2>
+    <form id="customerForm">
+      <label>First Name:</label>
+      <input name="first_name" required />
+
+      <label>Last Name:</label>
+      <input name="last_name" required />
+
+      <label>Address:</label>
+      <input name="address" required />
+
+      <label>City:</label>
+      <input name="city" required />
+
+      <label>State:</label>
+      <input name="state" required />
+
+      <label>Zip:</label>
+      <input name="zip" required />
+
+      <label>Phone:</label>
+      <input name="phone" required />
+
+      <label>Email:</label>
+      <input name="email" required />
+
+      <label>Notes:</label>
+      <input name="notes" />
+
+      <button type="submit">Submit</button>
+     <p id="status" style="text-align:center; margin-top: 10px; font-weight: bold;"></p>
+    </form>
+  </div>
+
+  <script>
+  document.getElementById("customerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    const statusMsg = document.getElementById("status");
+
+    try {
+      const response = await fetch("http://localhost:3000/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409 || result.message.includes("already exists")) {
+          statusMsg.textContent = "❌ Customer already exists!";
+          statusMsg.style.color = "red";
+        } else {
+          statusMsg.textContent = result.message || "❌ Error adding customer.";
+          statusMsg.style.color = "red";
+        }
+      } else {
+        statusMsg.textContent = "✅ Customer added successfully!";
+        statusMsg.style.color = "green";
+        form.reset();
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      statusMsg.textContent = "❌ Network error. Please try again.";
+      statusMsg.style.color = "red";
+    }
+  });
+</script>
+</body>
+</html>

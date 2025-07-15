@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customer List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    nav {
+      background-color: #28a745;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    table {
+      width: 90%;
+      margin: 2rem auto;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #28a745;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="form.html">➕ Add Customer</a>
+    <a href="customers.html">📋 View Customers</a>
+  </nav>
+
+  <h2>Customer List</h2>
+<input type="text" id="searchInput" placeholder="Search by name, email" onkeyup="filterTable()" style="margin-bottom: 15px; width: 300px;">
+
+  <table id="customerTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadCustomers() {
+      const res = await fetch('http://localhost:3000/api/customers');
+      const customers = await res.json();
+
+      const tbody = document.querySelector('#customerTable tbody');
+      tbody.innerHTML = ''; // Clear table
+
+      customers.forEach(c => {
+        const row = `
+          <tr>
+            <td>${c.customer_id}</td>
+            <td>${c.first_name}</td>
+            <td>${c.last_name}</td>
+            <td>${c.city}</td>
+            <td>${c.state}</td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
+            <td>${c.notes || ''}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    loadCustomers();
+    
+  function filterTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+      const name = row.cells[1].textContent.toLowerCase();
+      const email = row.cells[7].textContent.toLowerCase();
+      const city = row.cells[4].textContent.toLowerCase();
+
+      if (name.includes(input) || email.includes(input) || city.includes(input)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
+</script>
+
+  </script>
+</body>
+</html>
